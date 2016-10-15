@@ -1,0 +1,8 @@
+-buildpath: biz.aQute.bnd.annotation
+Import-Package:  \
+	org.daisy.dotify.api.tasks; provide:=true, *
+Private-Package: \
+	org.daisy.dotify.impl.input.markdown
+Include-Resource: / = src/
+-sources: false
+Service-Component: *
