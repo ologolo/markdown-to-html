@@ -35,6 +35,12 @@ public class MarkdownFactory implements TaskGroupFactory {
 		}
 		return false;
 	}
+	
+
+	@Override
+	public boolean supportsSpecification(TaskGroupInformation specification) {
+		return information.contains(specification);
+	}
 
 	@Override
 	public TaskGroup newTaskGroup(TaskGroupSpecification specification) {
