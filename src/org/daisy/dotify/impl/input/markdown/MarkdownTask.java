@@ -65,14 +65,18 @@ public class MarkdownTask extends ReadWriteTask {
 		}
 	}
 	
-	@Override
-	public List<TaskOption> getOptions() {
+	private static synchronized List<TaskOption> getOptionsInternal() {
 		if (options==null) {
 			options = new ArrayList<>();
 			options.add(new TaskOption.Builder(SOURCE_ENCODING).description("The encoding of the input file").defaultValue(DEFAULT_ENCODING).build());
 			options.add(new TaskOption.Builder(SOURCE_LANGUAGE).description("The language of the input file").defaultValue(DEFAULT_LANGUAGE).build());
 		}
-		return options;
+		return options;		
+	}
+	
+	@Override
+	public List<TaskOption> getOptions() {
+		return getOptionsInternal();
 	}
 
 }
