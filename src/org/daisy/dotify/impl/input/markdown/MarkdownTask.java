@@ -52,8 +52,13 @@ public class MarkdownTask extends ReadWriteTask {
 		try {
 			byte[] data = Files.readAllBytes(input.getFile().toPath());
 			String res = processor.markdownToHtml(new String(data, encoding));
-			try (PrintWriter w = new PrintWriter(output)) {
+			String outputEncoding = "utf-8";
+			try (PrintWriter w = new PrintWriter(output, outputEncoding)) {
+				w.println("<?xml version=\"1.0\" encoding=\""+outputEncoding+"\"?>");
 				w.println("<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\""+language+"\">");
+				w.println("<head>");
+				w.println("<meta charset=\""+outputEncoding+"\"/>");
+				w.println("</head>");
 				w.println("<body>");
 				w.print(res);
 				w.println("</body>");
