@@ -9,11 +9,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.daisy.dotify.api.tasks.AnnotatedFile;
-import org.daisy.dotify.api.tasks.DefaultAnnotatedFile;
-import org.daisy.dotify.api.tasks.InternalTaskException;
-import org.daisy.dotify.api.tasks.ReadWriteTask;
-import org.daisy.dotify.api.tasks.TaskOption;
+import org.daisy.streamline.api.tasks.AnnotatedFile;
+import org.daisy.streamline.api.tasks.DefaultAnnotatedFile;
+import org.daisy.streamline.api.tasks.InternalTaskException;
+import org.daisy.streamline.api.tasks.ReadWriteTask;
+import org.daisy.streamline.api.tasks.TaskOption;
 import org.pegdown.PegDownProcessor;
 
 public class MarkdownTask extends ReadWriteTask {

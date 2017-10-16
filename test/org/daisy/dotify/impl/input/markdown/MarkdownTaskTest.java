@@ -10,7 +10,7 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 
-import org.daisy.dotify.api.tasks.InternalTaskException;
+import org.daisy.streamline.api.tasks.InternalTaskException;
 import org.junit.Test;
 
 public class MarkdownTaskTest {
