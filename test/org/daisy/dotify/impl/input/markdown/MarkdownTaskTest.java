@@ -7,8 +7,9 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.daisy.streamline.api.tasks.InternalTaskException;
 import org.junit.Test;
@@ -17,7 +18,9 @@ public class MarkdownTaskTest {
 
 	@Test
 	public void test_01() throws IOException, InternalTaskException, URISyntaxException {
-		MarkdownTask mt = new MarkdownTask(Collections.emptyMap());
+		Map<String, Object> params = new HashMap<>();
+		params.put("source-language", "en");
+		MarkdownTask mt = new MarkdownTask(params);
 		File out = File.createTempFile("test", ".tmp");
 		out.deleteOnExit();
 		mt.execute(new File(this.getClass().getResource("resource-files/input.md").toURI()), out);
