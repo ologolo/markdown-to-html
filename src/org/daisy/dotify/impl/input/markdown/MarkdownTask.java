@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -14,7 +15,12 @@ import org.daisy.streamline.api.media.DefaultAnnotatedFile;
 import org.daisy.streamline.api.option.UserOption;
 import org.daisy.streamline.api.tasks.InternalTaskException;
 import org.daisy.streamline.api.tasks.ReadWriteTask;
-import org.pegdown.PegDownProcessor;
+
+import com.vladsch.flexmark.ext.autolink.AutolinkExtension;
+import com.vladsch.flexmark.ext.gfm.strikethrough.StrikethroughExtension;
+import com.vladsch.flexmark.html.HtmlRenderer;
+import com.vladsch.flexmark.parser.Parser;
+import com.vladsch.flexmark.util.options.MutableDataSet;
 
 public class MarkdownTask extends ReadWriteTask {
 	private static final String SOURCE_ENCODING = "source-encoding";
@@ -48,10 +54,18 @@ public class MarkdownTask extends ReadWriteTask {
 
 	@Override
 	public AnnotatedFile execute(AnnotatedFile input, File output) throws InternalTaskException {
-		PegDownProcessor processor = new PegDownProcessor();
+		MutableDataSet options = new MutableDataSet()
+				.set(Parser.EXTENSIONS, 
+					Arrays.asList(
+						AutolinkExtension.create(),
+						StrikethroughExtension.create()
+					)
+				);
+		Parser parser = Parser.builder(options).build();
+		HtmlRenderer renderer = HtmlRenderer.builder(options).build();
 		try {
 			byte[] data = Files.readAllBytes(input.getFile().toPath());
-			String res = processor.markdownToHtml(new String(data, encoding));
+			String res = renderer.render(parser.parse(new String(data, encoding)));
 			String outputEncoding = "utf-8";
 			try (PrintWriter w = new PrintWriter(output, outputEncoding)) {
 				w.println("<?xml version=\"1.0\" encoding=\""+outputEncoding+"\"?>");
