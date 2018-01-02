@@ -9,11 +9,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.daisy.streamline.api.tasks.AnnotatedFile;
-import org.daisy.streamline.api.tasks.DefaultAnnotatedFile;
+import org.daisy.streamline.api.media.AnnotatedFile;
+import org.daisy.streamline.api.media.DefaultAnnotatedFile;
+import org.daisy.streamline.api.option.UserOption;
 import org.daisy.streamline.api.tasks.InternalTaskException;
 import org.daisy.streamline.api.tasks.ReadWriteTask;
-import org.daisy.streamline.api.tasks.TaskOption;
 import org.pegdown.PegDownProcessor;
 
 public class MarkdownTask extends ReadWriteTask {
@@ -21,7 +21,7 @@ public class MarkdownTask extends ReadWriteTask {
 	private static final String SOURCE_LANGUAGE = "source-language";
 	private static final String DEFAULT_ENCODING = "utf-8";
 	private static final String DEFAULT_LANGUAGE = Locale.getDefault().toLanguageTag();
-	private static List<TaskOption> options = null;
+	private static List<UserOption> options = null;
 	private final String language;
 	private final String encoding;
 	
@@ -70,17 +70,17 @@ public class MarkdownTask extends ReadWriteTask {
 		}
 	}
 	
-	private static synchronized List<TaskOption> getOptionsInternal() {
+	private static synchronized List<UserOption> getOptionsInternal() {
 		if (options==null) {
 			options = new ArrayList<>();
-			options.add(new TaskOption.Builder(SOURCE_ENCODING).description("The encoding of the input file").defaultValue(DEFAULT_ENCODING).build());
-			options.add(new TaskOption.Builder(SOURCE_LANGUAGE).description("The language of the input file").defaultValue(DEFAULT_LANGUAGE).build());
+			options.add(new UserOption.Builder(SOURCE_ENCODING).description("The encoding of the input file").defaultValue(DEFAULT_ENCODING).build());
+			options.add(new UserOption.Builder(SOURCE_LANGUAGE).description("The language of the input file").defaultValue(DEFAULT_LANGUAGE).build());
 		}
 		return options;		
 	}
 	
 	@Override
-	public List<TaskOption> getOptions() {
+	public List<UserOption> getOptions() {
 		return getOptionsInternal();
 	}
 
