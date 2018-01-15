@@ -87,6 +87,11 @@ javadoc {
 	}
 }
 
+task zip(type: Zip, description: 'Packages the bundle for plugin distribution') {
+	from jar
+	from configurations.runtime
+}
+
 artifacts {
     archives javadocJar, sourcesJar
 }
