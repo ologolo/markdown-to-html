@@ -50,8 +50,9 @@ bundle {
     instructions << [
 		'-sources': 'true',
 		'Import-Package': 'org.daisy.streamline.api.tasks; provide:=true, *',
-		'Private-Package': 'org.daisy.dotify.impl.input.markdown',
+		'Private-Package': 'org.daisy.dotify.markdown.impl',
 		'Service-Component': '*',
+		'Automatic-Module-Name': "$moduleName",
         'Built-By': System.getProperty("user.name"),
         'Built-On': new Date().format('yyyy-MM-dd'),
         'Repository-Revision': "$repoRevision",

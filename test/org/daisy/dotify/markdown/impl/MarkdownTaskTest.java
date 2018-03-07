@@ -1,4 +1,4 @@
-package org.daisy.dotify.impl.input.markdown;
+package org.daisy.dotify.markdown.impl;
 
 import static org.junit.Assert.assertEquals;
 
