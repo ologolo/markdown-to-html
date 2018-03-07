@@ -37,23 +37,21 @@ repositories {
 }
 
 dependencies {
-	compileOnly group: "biz.aQute.bnd", name: "annotation", version: "2.3.0"
 	compile 'org.daisy.streamline:streamline-api:1.0.0'
 	compile 'com.vladsch.flexmark:flexmark-all:0.28.14'
 	testCompile group: "junit", name: "junit", version: "4.7"
 }
 
-task updateBndVersion() {
-	doLast() {
-		String contents = file('bnd.bnd').getText('UTF-8')
-		file('bnd.bnd').write(contents.replaceAll('Bundle-Version: [\\d\\.A-Za-z\\-]+', "Bundle-Version: $version"), 'UTF-8')
-	}
-}
-
+// Note that this jar currently is NOT compatible with OSGi. It's just built with the OSGi bundle tool
+// like all other projects for simplicity. If OSGi compatibility is added at a later time, the configuration
+// below should be a good start.
+// See also: https://github.com/brailleapps/dotify.markdown/issues/1
 bundle {
     instructions << [
-		//must use file() to resolve against the build.gradle in Eclipse
-        "-include": file('bnd.bnd'),
+		'-sources': 'true',
+		'Import-Package': 'org.daisy.streamline.api.tasks; provide:=true, *',
+		'Private-Package': 'org.daisy.dotify.impl.input.markdown',
+		'Service-Component': '*',
         'Built-By': System.getProperty("user.name"),
         'Built-On': new Date().format('yyyy-MM-dd'),
         'Repository-Revision': "$repoRevision",
