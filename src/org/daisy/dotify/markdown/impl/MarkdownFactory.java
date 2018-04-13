@@ -15,6 +15,7 @@ public class MarkdownFactory implements TaskGroupFactory {
 	public MarkdownFactory() {
 		Set<TaskGroupInformation> tmp = new HashSet<>();
 		tmp.add(TaskGroupInformation.newConvertBuilder("md", "html").build());
+		tmp.add(TaskGroupInformation.newConvertBuilder("markdown", "html").build());
 		information = Collections.unmodifiableSet(tmp);
 	}
 
