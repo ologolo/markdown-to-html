@@ -4,88 +4,60 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.daisy.streamline.api.media.AnnotatedFile;
+import org.daisy.streamline.api.media.BaseFolder;
 import org.daisy.streamline.api.media.DefaultAnnotatedFile;
+import org.daisy.streamline.api.media.DefaultFileSet;
+import org.daisy.streamline.api.media.FileSet;
+import org.daisy.streamline.api.media.ModifiableFileSet;
 import org.daisy.streamline.api.option.UserOption;
 import org.daisy.streamline.api.option.UserOptionValue;
 import org.daisy.streamline.api.tasks.InternalTaskException;
 import org.daisy.streamline.api.tasks.ReadWriteTask;
 
-import com.vladsch.flexmark.Extension;
-import com.vladsch.flexmark.ext.autolink.AutolinkExtension;
-import com.vladsch.flexmark.ext.gfm.strikethrough.StrikethroughExtension;
-import com.vladsch.flexmark.ext.gfm.tasklist.TaskListExtension;
-import com.vladsch.flexmark.ext.tables.TablesExtension;
+import com.vladsch.flexmark.ast.Document;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.options.MutableDataSet;
 
 public class MarkdownTask extends ReadWriteTask {
-	private static final String SOURCE_ENCODING = "source-encoding";
-	private static final String SOURCE_LANGUAGE = "source-language";
-	private static final String AUTO_LINKS = "auto-link";
-	private static final String STRIKETHROUGH = "github-strikethrough";
-	private static final String TABLES = "github-tables";
-	private static final String TASK_LISTS = "github-tasks";
-	private static final String DEFAULT_ENCODING = "utf-8";
-	private static final String DEFAULT_LANGUAGE = Locale.getDefault().toLanguageTag();
-	private static final String TRUE = "true";
+	private static final Logger logger = Logger.getLogger(MarkdownTask.class.getCanonicalName());
 	private static List<UserOption> options = null;
-	private final String language;
-	private final String encoding;
-	private final List<Extension> exts;
-	
+	private final MarkdownOptions markdownOpts;
+
 	public MarkdownTask(Map<String, Object> params) {
 		super("Markdown to HTML");
-		this.language = getLanguage(params);
-		this.encoding = getEncoding(params);
-		exts = new ArrayList<>();
-		if (TRUE.equals(params.get(TABLES))) {
-			exts.add(TablesExtension.create());
-		}
-		if (TRUE.equals(params.get(STRIKETHROUGH))) {
-			exts.add(StrikethroughExtension.create());
-		}
-		if (TRUE.equals(params.get(TASK_LISTS))) {
-			exts.add(TaskListExtension.create());
-		}
-		if (TRUE.equals(params.get(AUTO_LINKS))) {
-			exts.add(AutolinkExtension.create());
-		}
-	}
-	
-	private static String getEncoding(Map<String, Object> params) {
-		Object param = params.get(SOURCE_ENCODING);
-		return (param!=null)?""+param:DEFAULT_ENCODING;
-	}
-	
-	private static String getLanguage(Map<String, Object> params) {
-		Object param = params.get(SOURCE_LANGUAGE);
-		return (param!=null)?""+param:DEFAULT_LANGUAGE;
+		this.markdownOpts = MarkdownOptions.make(params);
 	}
 
 	@Override
+	@Deprecated
 	public void execute(File input, File output) throws InternalTaskException {
 		execute(new DefaultAnnotatedFile.Builder(input).build(), output);
 	}
-
+	
 	@Override
 	public AnnotatedFile execute(AnnotatedFile input, File output) throws InternalTaskException {
-		MutableDataSet options = new MutableDataSet().set(Parser.EXTENSIONS, exts);
+		MutableDataSet options = new MutableDataSet().set(Parser.EXTENSIONS, markdownOpts.getConfig());
 		Parser parser = Parser.builder(options).build();
 		HtmlRenderer renderer = HtmlRenderer.builder(options).build();
 		try {
-			byte[] data = Files.readAllBytes(input.getFile().toPath());
-			String res = renderer.render(parser.parse(new String(data, encoding)));
+			byte[] data = Files.readAllBytes(input.getPath());
+			Document d = parser.parse(new String(data, markdownOpts.getEncoding()));
+			ResourceRetriever v = new ResourceRetriever();
+			v.getRefs(d).forEach(System.out::println);
+			String res = renderer.render(d);
 			String outputEncoding = "utf-8";
 			try (PrintWriter w = new PrintWriter(output, outputEncoding)) {
 				w.println("<?xml version=\"1.0\" encoding=\""+outputEncoding+"\"?>");
-				w.println("<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\""+language+"\">");
+				w.println("<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\""+markdownOpts.getLanguage()+"\">");
 				w.println("<head>");
 				w.println("<meta charset=\""+outputEncoding+"\"/>");
 				w.println("</head>");
@@ -94,21 +66,65 @@ public class MarkdownTask extends ReadWriteTask {
 				w.println("</body>");
 				w.println("</html>");
 			}
-			return new DefaultAnnotatedFile.Builder(output).extension("html").mediaType("application/xhtml+xml").build();
+			return new DefaultAnnotatedFile.Builder(output.toPath()).extension("html").mediaType("application/xhtml+xml").build();
 		} catch (IOException e) {
 			throw new InternalTaskException(e);
 		}
 	}
-	
+
+	@Override
+	public ModifiableFileSet execute(FileSet input, BaseFolder output) throws InternalTaskException {
+		MutableDataSet options = new MutableDataSet().set(Parser.EXTENSIONS, markdownOpts.getConfig());
+		Parser parser = Parser.builder(options).build();
+		HtmlRenderer renderer = HtmlRenderer.builder(options).build();
+		try {
+			byte[] data = Files.readAllBytes(input.getManifest().getPath());
+			Document d = parser.parse(new String(data, markdownOpts.getEncoding()));
+			Path p = input.getBaseFolder().getPath().relativize(input.getManifest().getPath().getParent());
+			Path px = output.getPath();
+			Path p2 = px.resolve(p);
+			Path outputMainfest = p2.resolve("mainfest.html");
+			ResourceRetriever v = new ResourceRetriever();
+			List<String> refs = v.getRefs(d);
+			String res = renderer.render(d);
+			String outputEncoding = "utf-8";
+			try (PrintWriter w = new PrintWriter(outputMainfest.toFile(), outputEncoding)) {
+				w.println("<?xml version=\"1.0\" encoding=\""+outputEncoding+"\"?>");
+				w.println("<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\""+markdownOpts.getLanguage()+"\">");
+				w.println("<head>");
+				w.println("<meta charset=\""+outputEncoding+"\"/>");
+				w.println("</head>");
+				w.println("<body>");
+				w.print(res);
+				w.println("</body>");
+				w.println("</html>");
+			}
+			DefaultFileSet.Builder builder = DefaultFileSet.with(output, new DefaultAnnotatedFile.Builder(outputMainfest).extension("html").mediaType("application/xhtml+xml").build());
+			for (String ref : refs) {
+				Path r = input.getManifest().getPath().getParent().resolve(ref);
+				if (r.toFile().exists()) {
+					builder.add(DefaultAnnotatedFile.create(r), ref);
+				} else {
+					if (logger.isLoggable(Level.FINE)) {
+						logger.fine("File does not exist: " + r);
+					}
+				}
+			}
+			return builder.build();
+		} catch (IOException e) {
+			throw new InternalTaskException(e);
+		}
+	}
+
 	private static synchronized List<UserOption> getOptionsInternal() {
 		if (options==null) {
 			options = new ArrayList<>();
-			options.add(new UserOption.Builder(SOURCE_ENCODING).description("The encoding of the input file").defaultValue(DEFAULT_ENCODING).build());
-			options.add(new UserOption.Builder(SOURCE_LANGUAGE).description("The language of the input file").defaultValue(DEFAULT_LANGUAGE).build());
-			options.add(new UserOption.Builder(TABLES).description("Enables support for github tables").addValue(booleanTrue()).addValue(booleanFalse()).defaultValue("false").build());
-			options.add(new UserOption.Builder(STRIKETHROUGH).description("Enables support for strikethrough (e.g. ~~strike~~)").addValue(booleanTrue()).addValue(booleanFalse()).defaultValue("false").build());
-			options.add(new UserOption.Builder(TASK_LISTS).description("Enables support for github tasks").addValue(booleanTrue()).addValue(booleanFalse()).defaultValue("false").build());
-			options.add(new UserOption.Builder(AUTO_LINKS).description("Enables auto links").addValue(booleanTrue()).addValue(booleanFalse()).defaultValue("false").build());
+			options.add(new UserOption.Builder(MarkdownOptions.SOURCE_ENCODING).description("The encoding of the input file").defaultValue(MarkdownOptions.DEFAULT_ENCODING).build());
+			options.add(new UserOption.Builder(MarkdownOptions.SOURCE_LANGUAGE).description("The language of the input file").defaultValue(MarkdownOptions.DEFAULT_LANGUAGE).build());
+			options.add(new UserOption.Builder(MarkdownOptions.TABLES).description("Enables support for github tables").addValue(booleanTrue()).addValue(booleanFalse()).defaultValue("false").build());
+			options.add(new UserOption.Builder(MarkdownOptions.STRIKETHROUGH).description("Enables support for strikethrough (e.g. ~~strike~~)").addValue(booleanTrue()).addValue(booleanFalse()).defaultValue("false").build());
+			options.add(new UserOption.Builder(MarkdownOptions.TASK_LISTS).description("Enables support for github tasks").addValue(booleanTrue()).addValue(booleanFalse()).defaultValue("false").build());
+			options.add(new UserOption.Builder(MarkdownOptions.AUTO_LINKS).description("Enables auto links").addValue(booleanTrue()).addValue(booleanFalse()).defaultValue("false").build());
 		}
 		return options;		
 	}

@@ -33,13 +33,14 @@ javadoc {
 repositories {
 	mavenCentral()
 	//mavenLocal()
+	maven { url "https://oss.sonatype.org/content/groups/staging" }
 	//maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
 }
 
 dependencies {
-	compileOnly 'org.daisy.streamline:streamline-api:1.1.0'
+	compileOnly 'org.daisy.streamline:streamline-api:1.2.0'
 	compile 'com.vladsch.flexmark:flexmark-all:0.28.14'
-	testCompile 'org.daisy.streamline:streamline-api:1.1.0'
+	testCompile 'org.daisy.streamline:streamline-engine:1.2.0'
 	testCompile group: "junit", name: "junit", version: "4.7"
 }
 
