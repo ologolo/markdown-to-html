@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.org/brailleapps/dotify.markdown.svg?branch=master)](https://travis-ci.org/brailleapps/dotify.markdown)
 [![Type](https://img.shields.io/badge/type-provider_bundle-blue.svg)](https://github.com/brailleapps/wiki/wiki/Types)
+[![License: LGPL v2.1](https://img.shields.io/badge/License-LGPL%20v2%2E1%20%28or%20later%29-blue.svg)](https://www.gnu.org/licenses/lgpl-2.1)
 
 # dotify.markdown #
 Provides an implementation for converting markdown to HTML with Dotify.

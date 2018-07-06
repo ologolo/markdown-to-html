@@ -46,7 +46,7 @@ dependencies {
 	compile 'com.vladsch.flexmark:flexmark-ext-gfm-tasklist:0.28.14'
 	
 	testCompile 'org.daisy.streamline:streamline-engine:1.2.0'
-	testCompile group: "junit", name: "junit", version: "4.7"
+	testCompile group: "junit", name: "junit", version: "4.12"
 }
 
 // Note that this jar currently is NOT compatible with OSGi. It's just built with the OSGi bundle tool
@@ -63,7 +63,8 @@ bundle {
         'Built-By': System.getProperty("user.name"),
         'Built-On': new Date().format('yyyy-MM-dd'),
         'Repository-Revision': "$repoRevision",
-        'Repository-URL': "$repositoryURL"
+        'Repository-URL': "$repositoryURL",
+		'Include-Resource': 'LICENSE, NOTICE'
     ]
 }
 
