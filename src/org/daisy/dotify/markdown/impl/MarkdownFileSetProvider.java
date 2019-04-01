@@ -16,7 +16,7 @@ import org.daisy.streamline.api.media.FileSet;
 import org.daisy.streamline.api.media.FileSetException;
 import org.daisy.streamline.api.media.FileSetProvider;
 
-import com.vladsch.flexmark.ast.Document;
+import com.vladsch.flexmark.util.ast.Document;
 import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.options.MutableDataSet;
 

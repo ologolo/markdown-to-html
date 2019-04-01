@@ -49,13 +49,13 @@ repositories {
 }
 
 dependencies {
-	compileOnly 'org.daisy.streamline:streamline-api:1.2.0'
+	compileOnly 'org.daisy.streamline:streamline-api:1.3.0'
 	compileOnly 'org.osgi:org.osgi.service.component.annotations:1.3.0'
-	compile 'com.vladsch.flexmark:flexmark:0.28.14'
-	compile 'com.vladsch.flexmark:flexmark-ext-autolink:0.28.14'
-	compile 'com.vladsch.flexmark:flexmark-ext-tables:0.28.14'
-	compile 'com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.28.14'
-	compile 'com.vladsch.flexmark:flexmark-ext-gfm-tasklist:0.28.14'
+	compile 'com.vladsch.flexmark:flexmark:0.40.32'
+	compile 'com.vladsch.flexmark:flexmark-ext-autolink:0.40.32'
+	compile 'com.vladsch.flexmark:flexmark-ext-tables:0.40.32'
+	compile 'com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.40.32'
+	compile 'com.vladsch.flexmark:flexmark-ext-gfm-tasklist:0.40.32'
 	
 	testImplementation 'org.daisy.streamline:streamline-engine:1.2.0'
 	testImplementation group: "junit", name: "junit", version: "4.12"
