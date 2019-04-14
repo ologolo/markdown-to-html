@@ -64,7 +64,7 @@ dependencies {
 // Note that this jar currently is NOT compatible with OSGi. It's just built with the OSGi bundle tool
 // like all other projects for simplicity. If OSGi compatibility is added at a later time, the configuration
 // below should be a good start.
-// See also: https://github.com/brailleapps/dotify.markdown/issues/1
+// See also: https://github.com/ologolo/dotify.markdown/issues/1
 jar {
 	manifest {
 		attributes(
@@ -128,9 +128,9 @@ publishing {
 				beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 			}*/
 			pom {
-				name = 'dotify.markdown'
+				name = 'markdown-to-html'
 				packaging = 'jar'
-				description = 'Dotify Markdown'
+				description = 'Converts markdown to html'
 				url = "$repositoryURL"
 				scm {
 					connection = "$repositorySCM"
