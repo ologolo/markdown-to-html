@@ -66,7 +66,7 @@ public class MarkdownTask extends ReadWriteTask {
 				w.println("</body>");
 				w.println("</html>");
 			}
-			return new DefaultAnnotatedFile.Builder(output.toPath()).extension("html").mediaType("application/xhtml+xml").build();
+			return new DefaultAnnotatedFile.Builder(output.toPath()).extension("xhtml").mediaType("application/xhtml+xml").build();
 		} catch (IOException e) {
 			throw new InternalTaskException(e);
 		}
