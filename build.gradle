@@ -38,6 +38,7 @@ def repoRevision = System.getenv("REPO_REVISION")!=null?System.getenv("REPO_REVI
 
 javadoc {
 	options.encoding = 'UTF-8'
+	options.source = 8
 	options.links('https://docs.oracle.com/javase/8/docs/api/')
 }
 
